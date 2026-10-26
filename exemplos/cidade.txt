@@ -1,0 +1,17 @@
+# Cidade com 8 bairros — use em "Importar" > "Abrir arquivo .txt"
+direcionado: nao
+ponderado: sim
+
+A B 4
+A C 2
+B C 1
+B D 5
+C D 8
+C E 10
+D E 2
+D F 6
+D G 4
+E G 7
+F G 9
+F H 3
+G H 5

@@ -1,0 +1,144 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>SmartNet Analyzer</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23111'/%3E%3Cpath d='M9 22 16 10 23 20' stroke='%23fff' stroke-width='2' fill='none'/%3E%3Ccircle cx='9' cy='22' r='3.2' fill='%23fff'/%3E%3Ccircle cx='16' cy='10' r='3.2' fill='%23fff'/%3E%3Ccircle cx='23' cy='20' r='3.2' fill='%23fff'/%3E%3C/svg%3E">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/estilo.css') }}">
+</head>
+<body>
+  <header class="topo">
+    <div class="marca">
+      <svg class="logo" viewBox="0 0 32 32" aria-hidden="true">
+        <rect width="32" height="32" rx="7"/>
+        <path d="M9 22 16 10 23 20"/>
+        <circle cx="9" cy="22" r="3.2"/><circle cx="16" cy="10" r="3.2"/><circle cx="23" cy="20" r="3.2"/>
+      </svg>
+      <div>
+        <h1>SmartNet <span>Analyzer</span></h1>
+        <p>Infraestrutura de cidades inteligentes · Análise e Complexidade de Algoritmos</p>
+      </div>
+    </div>
+    <button id="btn-finalizar" class="botao botao-contorno">Finalizar aplicação</button>
+  </header>
+
+  <main class="layout">
+    <!-- ============ EDITOR DO GRAFO ============ -->
+    <section class="area-editor">
+      <div class="barra">
+        <div class="grupo segmentado" role="toolbar" aria-label="Ferramentas">
+          <button class="ferramenta ativa" data-ferramenta="mover" title="Mover e selecionar (V)">
+            <svg viewBox="0 0 24 24"><path d="M5 3l14 8-6 1.5L10 19z"/></svg><span>Mover</span>
+          </button>
+          <button class="ferramenta" data-ferramenta="vertice" title="Adicionar bairro (N)">
+            <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="7"/><path d="M12 9v6M9 12h6"/></svg><span>Vértice</span>
+          </button>
+          <button class="ferramenta" data-ferramenta="aresta" title="Ligar dois bairros (A)">
+            <svg viewBox="0 0 24 24"><circle cx="6" cy="17" r="3"/><circle cx="18" cy="7" r="3"/><path d="M8.5 15.5l7-7"/></svg><span>Aresta</span>
+          </button>
+          <button class="ferramenta" data-ferramenta="apagar" title="Apagar (D)">
+            <svg viewBox="0 0 24 24"><path d="M5 7h14M10 7V5h4v2M7 7l1 12h8l1-12"/></svg><span>Apagar</span>
+          </button>
+        </div>
+
+        <div class="grupo">
+          <label class="chave"><input type="checkbox" id="chk-direcionado"><span class="trilho"></span>Direcionado</label>
+          <label class="chave"><input type="checkbox" id="chk-ponderado" checked><span class="trilho"></span>Com peso</label>
+        </div>
+
+        <div class="grupo">
+          <select id="sel-exemplo" class="botao" title="Carregar um grafo de exemplo">
+            <option value="">Exemplos</option>
+          </select>
+          <button id="btn-importar" class="botao" title="Colar ou carregar um grafo em texto">Importar</button>
+          <button id="btn-exportar" class="botao" title="Baixar o grafo como .txt">Exportar</button>
+          <button id="btn-organizar" class="botao" title="Distribuir os vértices em círculo">Organizar</button>
+          <button id="btn-limpar" class="botao" title="Apagar o grafo inteiro">Limpar</button>
+        </div>
+      </div>
+
+      <div class="quadro" id="quadro">
+        <svg id="canvas" aria-label="Área de desenho do grafo"></svg>
+        <div class="vazio" id="vazio">
+          <strong>Comece a mapear a cidade</strong>
+          <span>Dê um <b>duplo clique</b> para criar um bairro, ou carregue um exemplo.</span>
+        </div>
+      </div>
+      <div class="rodape-quadro">
+        <div class="dica" id="dica"></div>
+        <div class="legenda" id="legenda" hidden>
+          <span><i class="bolinha fronteira"></i>em espera</span>
+          <span><i class="bolinha visitado"></i>visitado</span>
+          <span><i class="tracinho arvore"></i>selecionada</span>
+          <span><i class="tracinho foco"></i>analisando</span>
+          <span><i class="tracinho rejeitada"></i>rejeitada</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ ESTRUTURA EM MEMÓRIA ============ -->
+    <section class="area-estrutura">
+      <div class="cabecalho-estrutura">
+        <div class="titulo-estrutura">
+          <h2>Estrutura em memória</h2>
+          <span class="etiqueta">Lista de adjacência</span>
+        </div>
+        <div class="metricas" id="metricas"></div>
+        <label class="chave pequena"><input type="checkbox" id="chk-matriz"><span class="trilho"></span>Comparar com matriz</label>
+      </div>
+      <div class="estrutura" id="estrutura"></div>
+    </section>
+
+    <!-- ============ ALGORITMOS E RESULTADOS ============ -->
+    <aside class="lateral">
+      <section class="cartao">
+        <h2>Algoritmos</h2>
+        <div class="campos">
+          <label>Origem<select id="sel-origem"></select></label>
+          <label><span>Destino <small>(Dijkstra, opcional)</small></span><select id="sel-destino"></select></label>
+        </div>
+        <div class="botoes-algoritmo">
+          <button data-algoritmo="dfs"><strong>DFS</strong><span>Auditoria de rotas</span></button>
+          <button data-algoritmo="bfs"><strong>BFS</strong><span>Propagação de alertas</span></button>
+          <button data-algoritmo="dijkstra"><strong>Dijkstra</strong><span>Rota de emergência</span></button>
+          <button data-algoritmo="kruskal"><strong>Kruskal</strong><span>Rede de fibra ótica</span></button>
+        </div>
+      </section>
+
+      <section class="cartao resultado" id="resultado">
+        <div class="resultado-vazio">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="6" cy="18" r="2.5"/><circle cx="12" cy="6" r="2.5"/><circle cx="18" cy="16" r="2.5"/><path d="M7.2 15.8 10.8 8.2M13.4 8.1l3.4 5.7M8.5 17.6l7-1.2"/></svg>
+          <p>Monte um grafo e escolha um algoritmo.<br>O resultado e a animação aparecem aqui.</p>
+        </div>
+      </section>
+    </aside>
+  </main>
+
+  <!-- ============ IMPORTAR GRAFO EM TEXTO ============ -->
+  <dialog id="dlg-importar" class="janela">
+    <form method="dialog" id="form-importar">
+      <h2>Importar grafo</h2>
+      <p class="ajuda">Uma aresta por linha: <code>origem destino peso</code>. Uma linha com um único nome cria um vértice isolado.</p>
+      <textarea id="txt-importar" spellcheck="false" rows="12" placeholder="direcionado: nao&#10;ponderado: sim&#10;&#10;A B 4&#10;A C 2&#10;B C 1&#10;C D 7&#10;E"></textarea>
+      <div class="acoes-janela">
+        <label class="botao">Abrir arquivo .txt<input type="file" id="arq-importar" accept=".txt,text/plain" hidden></label>
+        <span class="espaco"></span>
+        <button value="cancelar" class="botao">Cancelar</button>
+        <button value="confirmar" class="botao botao-primario" id="btn-confirmar-importar">Importar</button>
+      </div>
+    </form>
+  </dialog>
+
+  <div class="avisos" id="avisos" aria-live="polite"></div>
+
+  <div class="finalizado" id="finalizado" hidden>
+    <div>
+      <h2>Aplicação finalizada</h2>
+      <p>O servidor foi encerrado. Pode fechar esta aba.</p>
+    </div>
+  </div>
+
+  <script type="module" src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+</html>
