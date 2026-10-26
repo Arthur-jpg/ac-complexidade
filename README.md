@@ -49,7 +49,7 @@ Para encerrar, use o botão **Finalizar aplicação** na tela ou `Ctrl+C` no ter
 python -m unittest -v
 ```
 
-São 25 testes, incluindo os exemplos clássicos do livro *Introduction to Algorithms* (Cormen), cujas respostas são conhecidas.
+São 26 testes, incluindo os exemplos clássicos do livro *Introduction to Algorithms* (Cormen), cujas respostas são conhecidas.
 
 ---
 
@@ -92,7 +92,7 @@ Escolha a **origem** (e, se quiser, um **destino** para o Dijkstra) e clique no 
 
 | Algoritmo | Resultado em texto/tabela |
 |---|---|
-| **DFS** | ordem de visita, **árvore da DFS**, tempos de descoberta/finalização, conectividade e becos sem saída |
+| **DFS** | ordem de visita, **árvore (ou floresta) da DFS**, tempos de descoberta/finalização, conectividade e becos sem saída |
 | **BFS** | **fila de execução** (ordem de saída da fila), árvore da BFS, nível de cada vértice e caminho mais curto em nº de arestas |
 | **Dijkstra** | **lista de distâncias** a partir da origem, anterior de cada vértice, rota completa e rota até o destino |
 | **Kruskal** | **arestas selecionadas e custo total**, mais o histórico de arestas aceitas/rejeitadas |
@@ -109,7 +109,10 @@ A regra é garantida pela própria estrutura: **as listas de vizinhos são manti
 
 - **Dijkstra**: a prioridade no heap é `(distância, nome)`, então empate de distância é resolvido pelo nome.
 - **Kruskal**: as arestas são ordenadas por `(peso, ponta 1, ponta 2)`, então A—B vem antes de A—C quando têm o mesmo peso.
+- **DFS**: quando a busca a partir da origem termina e ainda há vértices não visitados, ela **recomeça pelo próximo vértice não visitado em ordem alfabética**. O resultado é uma floresta, com uma árvore para cada recomeço.
 - Nomes só com números são comparados como números: `2` vem antes de `10`.
+
+A lista de vértices também é mantida em ordem desde a construção do grafo. Assim, o custo de ordenar fica na montagem do grafo, não dentro dos algoritmos.
 
 ---
 
@@ -140,7 +143,7 @@ V = número de vértices, E = número de arestas.
 
 ### DFS: O(V + E) de tempo, O(V) de memória
 
-Cada vértice é descoberto **uma vez**, porque o dicionário `descoberta` impede revisitas: O(V). Para cada vértice, a sua lista de vizinhos é percorrida **uma vez**. A soma do tamanho de todas as listas é E (direcionado) ou 2E (não-direcionado): O(E). A pilha de recursão tem no máximo V chamadas.
+Cada vértice é descoberto **uma vez**, porque o dicionário `descoberta` impede revisitas. O laço de recomeço passa por todos os vértices, mas só inicia uma busca nos não visitados. Total: O(V). Para cada vértice, a sua lista de vizinhos é percorrida **uma vez**. A soma do tamanho de todas as listas é E (direcionado) ou 2E (não-direcionado): O(E). A pilha de recursão tem no máximo V chamadas.
 
 ### BFS: O(V + E) de tempo, O(V) de memória
 

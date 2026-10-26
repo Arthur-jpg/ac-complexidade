@@ -87,14 +87,23 @@ class TestDFS(unittest.TestCase):
         self.assertEqual(r["pai"], {"C": None, "A": "C", "B": "A", "D": "C"})
 
     def test_tempos_cormen(self):
-        # Exemplo da figura 22.4 do Cormen (direcionado), começando em u
+        # Figura 22.4 do Cormen (direcionado), começando em u.
+        # Ao terminar a árvore de u, recomeça em w (próximo não visitado em ordem alfabética).
         grafo = montar([("u", "v"), ("u", "x"), ("v", "y"), ("w", "y"), ("w", "z"),
                         ("x", "v"), ("y", "x"), ("z", "z")], direcionado=True)
         r = dfs(grafo, "u")
-        self.assertEqual(r["ordem"], ["u", "v", "y", "x"])
-        self.assertEqual(r["descoberta"], {"u": 1, "v": 2, "y": 3, "x": 4})
-        self.assertEqual(r["finalizacao"], {"x": 5, "y": 6, "v": 7, "u": 8})
+        self.assertEqual(r["ordem"], ["u", "v", "y", "x", "w", "z"])
+        self.assertEqual(r["raizes"], ["u", "w"])
+        self.assertEqual(r["descoberta"], {"u": 1, "v": 2, "y": 3, "x": 4, "w": 9, "z": 10})
+        self.assertEqual(r["finalizacao"], {"x": 5, "y": 6, "v": 7, "u": 8, "z": 11, "w": 12})
         self.assertEqual(r["nao_alcancados"], ["w", "z"])
+
+    def test_recomeca_em_ordem_alfabetica(self):
+        # duas ilhas: {C, D} e {A, B}; começando em C, recomeça por A
+        grafo = montar([("C", "D"), ("B", "A")])
+        r = dfs(grafo, "C")
+        self.assertEqual(r["ordem"], ["C", "D", "A", "B"])
+        self.assertEqual(r["raizes"], ["C", "A"])
 
     def test_becos_sem_saida(self):
         grafo = montar([("A", "B"), ("B", "C"), ("B", "D"), ("C", "D")], vertices=["E"])

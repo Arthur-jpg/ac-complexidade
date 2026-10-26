@@ -20,17 +20,21 @@ def formatar_dfs(grafo, resultado, origem):
             v,
             resultado["descoberta"][v],
             resultado["finalizacao"][v],
-            resultado["pai"][v] or "—",
+            resultado["pai"][v] or "— (raiz)",
         ])
 
+    raizes = resultado["raizes"]
+    arvores = [desenhar_arvore(resultado["pai"], resultado["ordem"], raiz) for raiz in raizes]
     secoes = [
         {"tipo": "sequencia", "titulo": "Ordem de visita", "itens": resultado["ordem"]},
-        {"tipo": "arvore", "titulo": "Árvore da DFS",
-         "conteudo": desenhar_arvore(resultado["pai"], resultado["ordem"], origem)},
+        {"tipo": "arvore",
+         "titulo": "Árvore da DFS" if len(raizes) == 1 else "Floresta da DFS (%d árvores)" % len(raizes),
+         "conteudo": "\n\n".join(arvores)},
         {"tipo": "tabela", "titulo": "Tempos de descoberta e finalização",
          "colunas": ["Vértice", "Descoberta", "Finalização", "Pai"], "linhas": linhas},
         {"tipo": "texto", "titulo": "Conectividade",
-         "conteudo": _texto_conectividade(grafo, origem, resultado["nao_alcancados"])},
+         "conteudo": _texto_conectividade(grafo, origem, resultado["nao_alcancados"])
+         + (" A busca recomeçou por: %s." % ", ".join(raizes[1:]) if len(raizes) > 1 else "")},
         {"tipo": "texto", "titulo": "Becos sem saída",
          "conteudo": _texto_becos(grafo, resultado["becos_sem_saida"])},
     ]

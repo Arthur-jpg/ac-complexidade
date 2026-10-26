@@ -7,9 +7,10 @@ Cada vértice guarda a lista dos seus vizinhos, junto com o peso da aresta:
     B -> [(A, 4)]
     C -> [(A, 2)]
 
-As listas ficam SEMPRE em ordem alfabética. Assim, todo algoritmo que
-percorre os vizinhos já segue a regra da turma (empate -> ordem alfabética)
-sem precisar ordenar nada na hora.
+As listas ficam SEMPRE em ordem alfabética (e a lista de vértices também).
+Assim, todo algoritmo que percorre os vizinhos já segue a regra da turma
+(empate -> ordem alfabética) sem precisar ordenar nada na hora: o custo da
+ordenação fica na construção do grafo, não nos algoritmos.
 
 Grafo não-direcionado: a aresta A—B é guardada nos dois sentidos
 (B aparece na lista de A e A aparece na lista de B).
@@ -22,7 +23,6 @@ Por que lista e não matriz? (explicação completa no README)
     - O mapa de uma cidade é ESPARSO: cada bairro liga a poucos outros (E << V²).
 """
 
-from .estruturas.ordenacao import merge_sort
 from .ordem import chave_alfabetica
 
 
@@ -31,15 +31,17 @@ class Grafo:
         self.direcionado = direcionado
         self.ponderado = ponderado
         self._adjacencia = {}  # vértice -> lista de (vizinho, peso), em ordem alfabética
+        self._vertices = []    # todos os vértices, em ordem alfabética
 
     # ------------------------------------------------------------------
     # Construção
     # ------------------------------------------------------------------
 
     def adicionar_vertice(self, vertice):
-        """O(1)."""
+        """O(V) — por causa da inserção em ordem alfabética na lista de vértices."""
         if vertice not in self._adjacencia:
             self._adjacencia[vertice] = []
+            self._inserir_ordenado(self._vertices, vertice)
 
     def adicionar_aresta(self, origem, destino, peso=1):
         """O(grau) — por causa da inserção em ordem alfabética."""
@@ -73,9 +75,18 @@ class Grafo:
     # Consulta
     # ------------------------------------------------------------------
 
+    @staticmethod
+    def _inserir_ordenado(lista, vertice):
+        posicao = len(lista)
+        for i in range(len(lista)):
+            if chave_alfabetica(vertice) < chave_alfabetica(lista[i]):
+                posicao = i
+                break
+        lista.insert(posicao, vertice)
+
     def vertices(self):
-        """Todos os vértices em ordem alfabética. O(V log V)."""
-        return merge_sort(list(self._adjacencia), chave=chave_alfabetica)
+        """Todos os vértices em ordem alfabética. O(V) — a lista já é mantida ordenada."""
+        return list(self._vertices)
 
     def vizinhos(self, vertice):
         """Lista de (vizinho, peso) em ordem alfabética. O(1) para obter a lista."""

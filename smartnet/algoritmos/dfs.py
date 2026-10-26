@@ -6,13 +6,19 @@ Quando chega num vértice sem vizinho novo, VOLTA (backtracking) para o
 vértice anterior e tenta o próximo vizinho dele.
 Os vizinhos são tentados em ordem alfabética (a lista já está ordenada).
 
+Se a busca a partir da origem terminar e ainda houver vértices não
+visitados, ela RECOMEÇA pelo próximo vértice não visitado em ordem
+alfabética (padrão da aula / Cormen). O resultado é uma FLORESTA:
+uma árvore para cada recomeço.
+
 Para cada vértice anotamos:
     descoberta  -> o "instante" em que a busca chegou nele
     finalizacao -> o "instante" em que todos os vizinhos dele foram explorados
     pai         -> quem o descobriu (as ligações pai -> filho formam a árvore da DFS)
 
 Complexidade com lista de adjacência: O(V + E)
-    - cada vértice é visitado uma única vez                    -> O(V)
+    - cada vértice é visitado uma única vez (o laço de recomeço
+      passa por todos os vértices, mas só visita os não visitados) -> O(V)
     - a lista de vizinhos de cada vértice é percorrida uma vez,
       e a soma de todas as listas é E (ou 2E no não-direcionado) -> O(E)
 Com matriz seria O(V²): para achar os vizinhos de um vértice é preciso
@@ -82,15 +88,28 @@ def dfs(grafo, origem):
         )
 
     visitar(origem)
-
     nao_alcancados = [v for v in grafo.vertices() if v not in descoberta]
+
+    # Recomeça pelos vértices que sobraram, em ordem alfabética
+    raizes = [origem]
+    for vertice in grafo.vertices():
+        if vertice not in descoberta:
+            raizes.append(vertice)
+            pai[vertice] = None
+            registro.anotar(
+                "Ainda há vértices não visitados. Recomeça pelo próximo em ordem alfabética: %s." % vertice,
+                atual=vertice,
+            )
+            visitar(vertice)
+
     registro.anotar(
         "Fim da DFS. Ordem de visita: %s." % ", ".join(ordem_visita)
-        + (" Não alcançados a partir de %s: %s." % (origem, ", ".join(nao_alcancados)) if nao_alcancados else "")
+        + (" Floresta com %d árvores (raízes: %s)." % (len(raizes), ", ".join(raizes)) if len(raizes) > 1 else "")
     )
 
     return {
         "ordem": ordem_visita,
+        "raizes": raizes,
         "pai": pai,
         "descoberta": descoberta,
         "finalizacao": finalizacao,
