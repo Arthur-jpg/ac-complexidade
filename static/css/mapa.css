@@ -1,0 +1,110 @@
+/* =====================================================================
+   Modo mapa — mesmo visual preto e branco, em cima do mapa real
+   ===================================================================== */
+
+#mapa { position: absolute; inset: 0; background: var(--fundo); font-family: var(--fonte); }
+.leaflet-tile-pane { filter: grayscale(1) brightness(1.06) contrast(.92); }
+.quadro[data-ferramenta="vertice"] #mapa { cursor: copy; }
+.quadro[data-ferramenta="aresta"] #mapa,
+.quadro[data-ferramenta="aresta"] #mapa .pino { cursor: crosshair; }
+.quadro[data-ferramenta="apagar"] #mapa .pino,
+.quadro[data-ferramenta="apagar"] #mapa .via-alvo { cursor: not-allowed; }
+
+.nota-unidade { font-size: 12px; color: var(--cinza-escuro); line-height: 1.5; }
+
+/* ---------- Vias ---------- */
+
+#mapa .via { stroke: var(--grafite); stroke-width: 4; stroke-opacity: .85; stroke-linecap: round; stroke-linejoin: round; transition: stroke .2s, stroke-width .2s; }
+#mapa .via-alvo { cursor: pointer; }
+
+#mapa.modo-resultado .via { stroke: var(--cinza); stroke-width: 3; stroke-opacity: .55; }
+#mapa.modo-resultado .via.estado-arvore { stroke: var(--preto); stroke-width: 6; stroke-opacity: 1; }
+#mapa.modo-resultado .via.estado-caminho { stroke: var(--cinza-escuro); stroke-width: 6; stroke-opacity: .6; }
+#mapa.modo-resultado .via.estado-rejeitada { stroke: var(--cinza); stroke-width: 3; stroke-dasharray: 4 7; stroke-opacity: .9; }
+#mapa.modo-resultado .via.foco { stroke: var(--preto); stroke-width: 6; stroke-opacity: 1; stroke-dasharray: 10 8; animation: formigas .6s linear infinite; }
+
+/* Rota final: o resto da árvore do Dijkstra fica em segundo plano */
+#mapa.com-rota .via.estado-arvore { stroke: var(--cinza-escuro); stroke-width: 4; stroke-opacity: .5; }
+#mapa.com-rota .via.estado-caminho { stroke: var(--cinza-escuro); stroke-width: 5; stroke-opacity: .45; }
+#mapa.com-rota .pino.estado-visitado:not(.estado-caminho) .ponto { background: var(--cinza); border-color: var(--cinza); }
+#mapa.com-rota .pino .rotulo { opacity: .55; }
+#mapa.com-rota .pino.estado-caminho .rotulo { opacity: 1; }
+
+#mapa .rastro-fundo { stroke: var(--branco); stroke-opacity: 1; stroke-linecap: round; stroke-linejoin: round; fill: none; }
+#mapa .rastro { stroke: var(--preto); stroke-opacity: 1; stroke-linecap: round; stroke-linejoin: round; fill: none; }
+
+.peso-via.leaflet-tooltip {
+  background: var(--branco); color: var(--preto);
+  border: 1px solid var(--cinza-claro); border-radius: 5px;
+  padding: 0 5px; font: 600 11px/17px var(--fonte-mono);
+  box-shadow: none;
+}
+.peso-via.leaflet-tooltip::before { display: none; }
+#mapa.modo-resultado .peso-via { color: var(--cinza-escuro); border-color: var(--linha); }
+
+/* ---------- Pontos (bairros) ---------- */
+
+.pino { background: none; border: 0; }
+.pino .ponto {
+  position: absolute; inset: 1px;
+  border-radius: 50%; background: var(--branco); border: 2.5px solid var(--preto);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, .25);
+  transition: background .2s, transform .2s;
+}
+.pino:hover .ponto { transform: scale(1.2); }
+.pino .nome {
+  position: absolute; left: 20px; top: 50%; transform: translateY(-50%);
+  white-space: nowrap; font: 700 12px var(--fonte); color: var(--preto);
+  text-shadow: 0 0 3px var(--branco), 0 0 3px var(--branco), 0 0 3px var(--branco), 0 0 4px var(--branco);
+  pointer-events: none;
+}
+.pino .rotulo {
+  position: absolute; right: 18px; top: 50%; transform: translateY(-50%);
+  white-space: nowrap; font: 700 11px var(--fonte-mono);
+  background: var(--preto); color: var(--branco); padding: 1px 6px; border-radius: 5px;
+  pointer-events: none;
+}
+.pino .rotulo[hidden] { display: none; }
+.pino.pendente .ponto { background: var(--cinza-claro); transform: scale(1.35); }
+
+#mapa.modo-resultado .pino .ponto { border-color: var(--cinza); box-shadow: none; }
+#mapa.modo-resultado .pino .nome { color: var(--cinza-escuro); }
+#mapa.modo-resultado .pino.estado-fronteira .ponto { background: var(--cinza-claro); border-color: var(--preto); }
+#mapa.modo-resultado .pino.estado-visitado .ponto,
+#mapa.modo-resultado .pino.estado-caminho .ponto { background: var(--preto); border-color: var(--preto); }
+#mapa.modo-resultado .pino[class*="estado-"] .nome { color: var(--preto); }
+#mapa.modo-resultado .pino.estado-caminho .ponto { box-shadow: 0 0 0 3px var(--branco), 0 0 0 5px var(--preto); }
+.pino.atual .ponto::after {
+  content: ""; position: absolute; inset: -4px; border-radius: 50%;
+  border: 2.5px solid var(--preto); animation: pulso-mapa 1.1s ease-out infinite;
+}
+@keyframes pulso-mapa { from { transform: scale(1); opacity: 1; } to { transform: scale(2.1); opacity: 0; } }
+
+/* ---------- "Carro" da rota final ---------- */
+
+.carro { background: none; border: 0; }
+.carro span {
+  position: absolute; inset: 2px; border-radius: 50%;
+  background: var(--preto); border: 3px solid var(--branco);
+  box-shadow: 0 0 0 2px var(--preto), 0 2px 8px rgba(0, 0, 0, .4);
+}
+.carro span::after {
+  content: ""; position: absolute; inset: -9px; border-radius: 50%;
+  border: 2px solid var(--preto); animation: pulso-mapa 1s ease-out infinite;
+}
+.carro.chegou span::after { animation-duration: 1.6s; }
+
+/* ---------- Popups ---------- */
+
+.popup-smartnet .leaflet-popup-content-wrapper { border-radius: 10px; box-shadow: 0 8px 28px rgba(0, 0, 0, .18); }
+.popup-smartnet .leaflet-popup-content { margin: 12px 14px; font: 13px/1.45 var(--fonte); color: var(--preto); }
+.popup-smartnet strong { font-size: 14px; }
+.linha-popup { margin-top: 2px; }
+.linha-popup.fraco { color: var(--cinza-escuro); font-size: 12px; }
+.acoes-popup { display: flex; gap: 6px; margin-top: 10px; }
+.acoes-popup .botao { padding: 6px 10px; font-size: 12px; }
+.form-ponto { display: flex; flex-direction: column; gap: 8px; min-width: 190px; }
+.form-ponto input { font: inherit; padding: 7px 9px; border: 1.5px solid var(--preto); border-radius: 7px; outline: none; }
+
+.leaflet-control-attribution { font-size: 10px; }
+.leaflet-bar a { color: var(--preto); }

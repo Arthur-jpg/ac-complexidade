@@ -4,9 +4,10 @@ Rodar com:  python -m unittest -v
 """
 
 import json
+import os
 import unittest
 
-from smartnet import central
+from smartnet import central, mapa
 from smartnet.algoritmos import bfs, dfs, dijkstra, kruskal
 from smartnet.estruturas.fila import Fila
 from smartnet.estruturas.heap import HeapMinimo
@@ -214,6 +215,51 @@ class TestCentral(unittest.TestCase):
             {"vertice": "B", "peso": 3}, {"vertice": "C", "peso": 1}]})
         self.assertEqual(rep["memoria_lista"], 4 + 8)
         self.assertEqual(rep["memoria_matriz"], 16)
+
+
+class TestMapa(unittest.TestCase):
+    def test_haversine(self):
+        # Centro -> Copacabana: uns 7,3 km em linha reta
+        km = mapa.haversine_km(-22.9035, -43.1770, -22.9690, -43.1860)
+        self.assertAlmostEqual(km, 7.3, delta=0.1)
+        self.assertEqual(mapa.haversine_km(-22.9, -43.1, -22.9, -43.1), 0)
+
+    def test_simplificar_remove_pontos_alinhados(self):
+        reta = [[0, 0], [0, 1], [0, 2], [0, 3]]
+        self.assertEqual(mapa.simplificar(reta, 0.01), [[0, 0], [0, 3]])
+        curva = [[0, 0], [1, 1], [0, 2]]
+        self.assertEqual(mapa.simplificar(curva, 0.01), curva)
+
+    def test_sem_internet_usa_linha_reta(self):
+        original = mapa._baixar_json
+
+        def sem_rede(url):
+            raise OSError("sem rede")
+
+        mapa._baixar_json = sem_rede
+        try:
+            medida = mapa.medir_via(-22.9035, -43.1770, -22.9690, -43.1860)
+        finally:
+            mapa._baixar_json = original
+        self.assertEqual(medida["fonte"], "linha_reta")
+        self.assertEqual(medida["km"], medida["reta"])
+        self.assertEqual(len(medida["geometria"]), 2)
+
+    def test_redes_prontas_sao_grafos_validos(self):
+        # as cidades do modo mapa passam pelo mesmo back-end do quadro branco
+        caminho = os.path.join(os.path.dirname(__file__), "..", "static", "dados", "cidades.json")
+        with open(caminho, encoding="utf-8") as arquivo:
+            cidades = json.load(arquivo)
+        rio = next(c for c in cidades if c["id"] == "rio")
+        resposta = central.executar({
+            "grafo": {"direcionado": False, "ponderado": True,
+                      "vertices": [b["nome"] for b in rio["bairros"]],
+                      "arestas": [{"origem": v["origem"], "destino": v["destino"], "peso": v["km"]}
+                                  for v in rio["vias"]]},
+            "algoritmo": "dijkstra", "origem": "Copacabana", "destino": "Campo Grande",
+        })
+        self.assertTrue(resposta["secoes"][0]["conteudo"].startswith("Copacabana → "))
+        self.assertTrue(resposta["secoes"][0]["conteudo"].split(" → ")[-1].startswith("Campo Grande"))
 
 
 if __name__ == "__main__":

@@ -2,6 +2,11 @@
 
 Ferramenta para mapear uma cidade inteligente como um **grafo** (bairros = vértices, vias/conexões = arestas) e executar análises de conectividade e roteamento: **DFS, BFS, Dijkstra e Kruskal**.
 
+Tem dois modos, que usam o mesmo back-end e os mesmos algoritmos:
+
+- **Quadro branco**: você desenha qualquer grafo com o mouse (direcionado ou não, com ou sem peso) ou cola o grafo em texto.
+- **Mapa real**: os bairros do Rio de Janeiro (e de São Paulo e Belo Horizonte) sobre o mapa da cidade. O peso de cada via é a **distância real pelas ruas**, e a rota do Dijkstra é animada **rua por rua**.
+
 | | |
 |---|---|
 | **Curso** | Engenharia de Computação / Software |
@@ -19,41 +24,108 @@ Ferramenta para mapear uma cidade inteligente como um **grafo** (bairros = vért
 
 ---
 
-## Como executar
+## Como executar (passo a passo)
 
-Requisitos: **Python 3.9 ou superior** e um navegador atualizado (Chrome, Edge ou Firefox).
+> **Resumo para quem já tem Python:** `pip install -r requirements.txt` e depois `python app.py`. O navegador abre sozinho.
+
+### 1. Ter o Python instalado
+
+Precisa do **Python 3.9 ou mais novo**. Para conferir, abra um terminal e digite:
 
 ```bash
-# 1. clonar o repositório
-git clone <url-do-repositorio>
-cd ac-complexidade
+python --version
+```
 
-# 2. (opcional) criar um ambiente virtual
-python -m venv .venv
-.venv\Scripts\activate          # Windows
-source .venv/bin/activate       # Linux / macOS
+- Se aparecer `Python 3.9` ou maior, está pronto.
+- No **Windows**, se der "comando não encontrado", tente `py --version`. Se funcionar, use `py` no lugar de `python` nos passos abaixo.
+- Se não tiver Python, baixe em <https://www.python.org/downloads/>. No Windows, **marque a opção "Add Python to PATH"** na primeira tela do instalador.
 
-# 3. instalar a única dependência (Flask, só para servir a página)
+### 2. Baixar o projeto
+
+Escolha uma das opções:
+
+- **Com Git:**
+  ```bash
+  git clone <url-do-repositorio>
+  cd ac-complexidade
+  ```
+- **Sem Git:** na página do repositório no GitHub, clique em **Code → Download ZIP**, extraia o arquivo e entre na pasta extraída.
+
+### 3. Abrir um terminal dentro da pasta do projeto
+
+- **Windows:** abra a pasta no Explorador de Arquivos, clique na barra de endereço, digite `cmd` e aperte **Enter**.
+- **macOS:** clique com o botão direito na pasta e escolha **Novo Terminal na Pasta**.
+- **Linux:** clique com o botão direito dentro da pasta e escolha **Abrir no terminal**.
+
+Para conferir que está na pasta certa, rode `dir` (Windows) ou `ls` (macOS/Linux). O arquivo `app.py` precisa aparecer na lista.
+
+### 4. Instalar a única dependência (Flask)
+
+```bash
 pip install -r requirements.txt
+```
 
-# 4. rodar
+Se `pip` não for reconhecido, use `python -m pip install -r requirements.txt`.
+
+O Flask só serve a página web. **Nenhum algoritmo nem estrutura de dados vem de biblioteca.**
+
+> Opcional: para não misturar com outros projetos, dá para usar um ambiente virtual antes do passo 4:
+> `python -m venv .venv` e depois `.venv\Scripts\activate` (Windows) ou `source .venv/bin/activate` (macOS/Linux).
+
+### 5. Rodar
+
+```bash
 python app.py
 ```
 
-O navegador abre sozinho em **http://localhost:5000**. Se não abrir, acesse esse endereço manualmente.
-Para encerrar, use o botão **Finalizar aplicação** na tela ou `Ctrl+C` no terminal.
+O terminal mostra algo assim:
 
-### Rodar os testes automáticos
+```
+  SmartNet Analyzer rodando em  http://localhost:5000
+  Modo mapa:                    http://localhost:5000/mapa
+```
+
+O navegador abre sozinho. Se não abrir, copie o endereço do terminal para o navegador (Chrome, Edge ou Firefox).
+Para trocar de modo, use os botões **Quadro branco / Mapa real** no topo da página.
+
+### 6. Encerrar
+
+Clique em **Finalizar aplicação**, no canto superior direito, e clique de novo para confirmar. Outra opção é apertar `Ctrl+C` no terminal.
+
+### Se algo der errado
+
+| Problema | Solução |
+|---|---|
+| `python` não é reconhecido | Use `py` (Windows) ou `python3` (macOS/Linux) |
+| `pip` não é reconhecido | Use `python -m pip install -r requirements.txt` |
+| `ModuleNotFoundError: No module named 'flask'` | O passo 4 não foi feito, ou foi feito em outro Python. Rode `python -m pip install flask` |
+| A porta 5000 está ocupada (comum no macOS por causa do AirPlay) | Nada a fazer: o programa usa a próxima porta livre (5001, 5002...) e mostra o endereço no terminal |
+| O navegador não abriu sozinho | Abra manualmente o endereço que aparece no terminal |
+| O mapa aparece cinza, sem ruas | O modo mapa precisa de **internet** para baixar o mapa de fundo. O quadro branco funciona offline |
+
+### Testes automáticos
 
 ```bash
 python -m unittest -v
 ```
 
-São 26 testes, incluindo os exemplos clássicos do livro *Introduction to Algorithms* (Cormen), cujas respostas são conhecidas.
+São 30 testes. Eles incluem os exemplos clássicos do livro *Introduction to Algorithms* (Cormen), cujas respostas são conhecidas, e testes do modo mapa.
 
 ---
 
-## Como usar
+## Roteiro rápido para testar (2 minutos)
+
+1. No **Quadro branco**, escolha **Exemplos → Cidade: 8 bairros**.
+2. Escolha a origem **A** e o destino **H**, e clique em **Dijkstra**. A rota sai **A → C → B → D → G → H, custo 17**, e o desenho é animado passo a passo.
+3. Clique em **Kruskal**. O custo total da árvore geradora mínima é **22**.
+4. Para testar **outro grafo**, você pode:
+   - desenhar à mão: duplo clique cria um vértice, e Shift + arrastar liga dois vértices;
+   - clicar em **Importar** e colar o grafo em texto, no formato descrito mais abaixo.
+5. Clique em **Mapa real**. O Rio de Janeiro já vem com 21 bairros e 30 vias. Clique em **Dijkstra**: a rota **Copacabana → Campo Grande** aparece percorrendo as ruas.
+
+---
+
+## Como usar: quadro branco
 
 ### 1. Montar o grafo
 
@@ -82,6 +154,8 @@ B C        # sem peso: vale 1
 E          # vértice isolado
 ```
 
+Também aceita `A -> B 4` e `A,B,4`. A pasta `exemplos/` tem um arquivo pronto para importar.
+
 ### 2. Ver a estrutura em memória
 
 O painel **Estrutura em memória** mostra a **lista de adjacência exatamente como o back-end a guardou**. Os dados vêm direto do objeto Python, pela rota `/api/estrutura`. A chave *Comparar com matriz* mostra a matriz equivalente, só para comparação; o programa usa apenas a lista.
@@ -98,6 +172,40 @@ Escolha a **origem** (e, se quiser, um **destino** para o Dijkstra) e clique no 
 | **Kruskal** | **arestas selecionadas e custo total**, mais o histórico de arestas aceitas/rejeitadas |
 
 Além disso, a execução é **animada passo a passo** no desenho. O player permite pausar, avançar, voltar e mudar a velocidade (`←` `→` `espaço`). Em cada passo aparecem a explicação e o conteúdo da estrutura auxiliar (pilha, fila, heap ou componentes do Union-Find). A linha correspondente da lista de adjacência acende para mostrar qual lista de vizinhos está sendo percorrida.
+
+---
+
+## Como usar: mapa real
+
+O modo mapa leva o problema para uma cidade de verdade.
+
+- **Cidade**: Rio de Janeiro (21 bairros, 30 vias), São Paulo ou Belo Horizonte. Cada uma já vem com uma rede pronta.
+- **Peso das vias**, escolhido na barra:
+  - **distância pelas ruas (km)**: o padrão, calculada pelo trajeto de carro;
+  - **tempo de carro (min)**: estimativa sem trânsito;
+  - **linha reta (km)**: fórmula de Haversine, implementada em `smartnet/mapa.py`.
+
+  Trocar o peso muda o resultado do Dijkstra e do Kruskal.
+- **Navegar**: clique em um bairro e escolha **Partir daqui** ou **Ir até aqui**. "Ir até aqui" já roda o Dijkstra.
+- **Ponto**: clique em qualquer lugar do mapa para criar um vértice. O nome do bairro é sugerido automaticamente.
+- **Via**: clique em um ponto e depois em outro. A via é traçada **pelas ruas**, com a distância real.
+- **Apagar**: clique em um ponto ou em uma via.
+- Os quatro algoritmos, a animação e o painel da lista de adjacência funcionam igual ao quadro branco. No Dijkstra com destino, no final, um marcador **percorre a rota pelas ruas**.
+
+As vias do mapa valem nos dois sentidos, então o grafo é não-direcionado e o Kruskal se aplica.
+
+**De onde vêm os dados:**
+
+| O quê | Fonte | Precisa de internet? |
+|---|---|---|
+| Desenho do mapa de fundo | OpenStreetMap, exibido com a biblioteca Leaflet | sim |
+| Redes prontas das cidades (km, minutos e traçado de cada via) | arquivo `static/dados/cidades.json`, gerado uma vez com `ferramentas/gerar_cidades.py` | não |
+| Novas vias criadas na hora | serviço público de rotas OSRM, chamado pelo back-end (`/api/via`) | sim. Sem internet, usa a linha reta e avisa |
+| Nome sugerido para um ponto novo | Nominatim (OpenStreetMap) | sim. Sem internet, sugere "Ponto N" |
+
+O OSRM só é usado para **medir** cada via, ou seja, para dar o peso da aresta. **Quem calcula o caminho mínimo entre os bairros, a árvore geradora e as buscas são os nossos algoritmos**, rodando sobre a nossa lista de adjacência.
+
+O mapa também reforça a escolha da estrutura. No Rio, V = 21 e E = 30: a lista guarda **81** posições, e a matriz ocuparia **441** (o painel mostra esses números ao vivo).
 
 ---
 
@@ -175,13 +283,14 @@ O Kruskal **só se aplica a grafos não-direcionados**. Se o grafo for direciona
 ## Arquitetura
 
 ```
-app.py                      servidor Flask: serve a página e as 3 rotas da API
+app.py                      servidor Flask: serve as páginas e as rotas da API
 smartnet/
 ├── grafo.py                ★ estrutura de dados: LISTA DE ADJACÊNCIA feita do zero
 ├── ordem.py                regra de desempate (ordem alfabética)
 ├── central.py              recebe o pedido da tela e direciona para o algoritmo certo
 ├── apresentacao.py         transforma o resultado em textos/tabelas
 ├── passos.py               "diário" dos passos, usado pela animação
+├── mapa.py                 modo mapa: mede as vias (OSRM / Haversine)
 ├── algoritmos/
 │   ├── dfs.py              Busca em Profundidade
 │   ├── bfs.py              Busca em Largura
@@ -191,14 +300,19 @@ smartnet/
     ├── fila.py             fila FIFO (BFS)
     ├── heap.py             heap binário de mínimo (Dijkstra)
     ├── union_find.py       conjuntos disjuntos (Kruskal)
-    └── ordenacao.py        merge sort (Kruskal e ordem alfabética)
-templates/index.html        a página
-static/css/estilo.css       visual
-static/js/                  interface (editor do grafo, painéis, animação)
+    └── ordenacao.py        merge sort (Kruskal)
+templates/
+├── index.html              página do quadro branco
+└── mapa.html               página do mapa real
+static/
+├── css/                    visual (preto e branco)
+├── js/                     interface: editor, mapa, painéis, animação
+└── dados/cidades.json      bairros e vias prontas das cidades
+ferramentas/gerar_cidades.py  gera o cidades.json consultando o OSRM
 tests/test_algoritmos.py    testes automáticos
 ```
 
-**Fluxo de uma execução:**
+**Fluxo de uma execução (igual nos dois modos):**
 
 ```
 tela  ──(JSON: grafo + algoritmo + origem)──▶  POST /api/executar
@@ -211,6 +325,10 @@ tela  ──(JSON: grafo + algoritmo + origem)──▶  POST /api/executar
 tela  ◀──(JSON: seções de texto/tabela + passos da animação)──┘
 ```
 
-**Nenhuma biblioteca é usada na estrutura de dados nem nos algoritmos.** O grafo, a fila, o heap, o Union-Find e o merge sort foram implementados do zero. O Flask só serve a página e recebe as requisições. A interface usa JavaScript puro com SVG, sem bibliotecas de grafos.
+**Nenhuma biblioteca é usada na estrutura de dados nem nos algoritmos.** O grafo, a fila, o heap, o Union-Find e o merge sort foram implementados do zero. As outras peças têm papéis limitados:
+
+- o **Flask** só serve a página e recebe as requisições;
+- o quadro branco usa JavaScript puro com SVG, sem bibliotecas de grafos;
+- no modo mapa, o **Leaflet** só desenha o mapa de fundo, e o **OSRM** só mede o comprimento de cada via.
 
 O registro dos passos para a animação (`passos.py`) só *anota* o que o algoritmo fez. Ele não participa da lógica, e a análise de complexidade acima considera apenas o algoritmo.

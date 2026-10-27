@@ -1,0 +1,137 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>SmartNet Analyzer · Mapa</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23111'/%3E%3Cpath d='M9 22 16 10 23 20' stroke='%23fff' stroke-width='2' fill='none'/%3E%3Ccircle cx='9' cy='22' r='3.2' fill='%23fff'/%3E%3Ccircle cx='16' cy='10' r='3.2' fill='%23fff'/%3E%3Ccircle cx='23' cy='20' r='3.2' fill='%23fff'/%3E%3C/svg%3E">
+  <!-- Leaflet: só DESENHA o mapa de fundo. Nenhum algoritmo vem dele. -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/estilo.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/mapa.css') }}">
+</head>
+<body>
+  <header class="topo">
+    <div class="marca">
+      <svg class="logo" viewBox="0 0 32 32" aria-hidden="true">
+        <rect width="32" height="32" rx="7"/>
+        <path d="M9 22 16 10 23 20"/>
+        <circle cx="9" cy="22" r="3.2"/><circle cx="16" cy="10" r="3.2"/><circle cx="23" cy="20" r="3.2"/>
+      </svg>
+      <div>
+        <h1>SmartNet <span>Analyzer</span></h1>
+        <p>Infraestrutura de cidades inteligentes · Análise e Complexidade de Algoritmos</p>
+      </div>
+    </div>
+    <nav class="modos" aria-label="Modo">
+      <a href="/">Quadro branco</a>
+      <a href="/mapa" class="ativo" aria-current="page">Mapa real</a>
+    </nav>
+    <button id="btn-finalizar" class="botao botao-contorno">Finalizar aplicação</button>
+  </header>
+
+  <main class="layout">
+    <!-- ============ MAPA ============ -->
+    <section class="area-editor">
+      <div class="barra">
+        <div class="grupo">
+          <select id="sel-cidade" class="botao" title="Cidade"></select>
+        </div>
+
+        <div class="grupo segmentado" role="toolbar" aria-label="Ferramentas">
+          <button class="ferramenta ativa" data-ferramenta="mover" title="Navegar e escolher origem/destino (V)">
+            <svg viewBox="0 0 24 24"><path d="M5 3l14 8-6 1.5L10 19z"/></svg><span>Navegar</span>
+          </button>
+          <button class="ferramenta" data-ferramenta="vertice" title="Adicionar um ponto no mapa (N)">
+            <svg viewBox="0 0 24 24"><path d="M12 21s-6-5.5-6-11a6 6 0 0 1 12 0c0 5.5-6 11-6 11z"/><path d="M12 7.5v5M9.5 10h5"/></svg><span>Ponto</span>
+          </button>
+          <button class="ferramenta" data-ferramenta="aresta" title="Ligar dois pontos por uma via (A)">
+            <svg viewBox="0 0 24 24"><circle cx="6" cy="17" r="3"/><circle cx="18" cy="7" r="3"/><path d="M8.5 15.5c3-1 2-6 7-7"/></svg><span>Via</span>
+          </button>
+          <button class="ferramenta" data-ferramenta="apagar" title="Apagar (D)">
+            <svg viewBox="0 0 24 24"><path d="M5 7h14M10 7V5h4v2M7 7l1 12h8l1-12"/></svg><span>Apagar</span>
+          </button>
+        </div>
+
+        <div class="grupo">
+          <select id="sel-peso" class="botao" title="O que vale como peso de cada via">
+            <option value="km">Peso: distância pelas ruas (km)</option>
+            <option value="minutos">Peso: tempo de carro (min)</option>
+            <option value="reta">Peso: linha reta (km)</option>
+          </select>
+          <label class="chave"><input type="checkbox" id="chk-pesos" checked><span class="trilho"></span>Pesos no mapa</label>
+        </div>
+
+        <div class="grupo">
+          <button id="btn-restaurar" class="botao" title="Volta para a rede pronta da cidade">Rede pronta</button>
+          <button id="btn-limpar" class="botao" title="Apagar todos os pontos e vias">Limpar</button>
+        </div>
+      </div>
+
+      <div class="quadro quadro-mapa" id="quadro">
+        <div id="mapa" aria-label="Mapa da cidade"></div>
+      </div>
+      <div class="rodape-quadro">
+        <div class="dica" id="dica"></div>
+        <div class="legenda" id="legenda" hidden>
+          <span><i class="bolinha fronteira"></i>em espera</span>
+          <span><i class="bolinha visitado"></i>visitado</span>
+          <span><i class="tracinho arvore"></i>selecionada</span>
+          <span><i class="tracinho foco"></i>analisando</span>
+          <span><i class="tracinho rejeitada"></i>rejeitada</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ ESTRUTURA EM MEMÓRIA ============ -->
+    <section class="area-estrutura">
+      <div class="cabecalho-estrutura">
+        <div class="titulo-estrutura">
+          <h2>Estrutura em memória</h2>
+          <span class="etiqueta">Lista de adjacência</span>
+        </div>
+        <div class="metricas" id="metricas"></div>
+        <label class="chave pequena"><input type="checkbox" id="chk-matriz"><span class="trilho"></span>Comparar com matriz</label>
+      </div>
+      <div class="estrutura" id="estrutura"></div>
+    </section>
+
+    <!-- ============ ALGORITMOS E RESULTADOS ============ -->
+    <aside class="lateral">
+      <section class="cartao">
+        <h2>Algoritmos</h2>
+        <div class="campos">
+          <label>Origem<select id="sel-origem"></select></label>
+          <label><span>Destino <small>(Dijkstra)</small></span><select id="sel-destino"></select></label>
+        </div>
+        <div class="botoes-algoritmo">
+          <button data-algoritmo="dfs"><strong>DFS</strong><span>Auditoria de rotas</span></button>
+          <button data-algoritmo="bfs"><strong>BFS</strong><span>Propagação de alertas</span></button>
+          <button data-algoritmo="dijkstra"><strong>Dijkstra</strong><span>Rota de emergência</span></button>
+          <button data-algoritmo="kruskal"><strong>Kruskal</strong><span>Rede de fibra ótica</span></button>
+        </div>
+        <p class="nota-unidade" id="nota-unidade"></p>
+      </section>
+
+      <section class="cartao resultado" id="resultado">
+        <div class="resultado-vazio">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s-6-5.5-6-11a6 6 0 0 1 12 0c0 5.5-6 11-6 11z"/><circle cx="12" cy="10" r="2.2"/></svg>
+          <p>Escolha a origem e o destino (ou clique nos bairros)<br>e rode um algoritmo. A rota aparece pelas ruas.</p>
+        </div>
+      </section>
+    </aside>
+  </main>
+
+  <div class="avisos" id="avisos" aria-live="polite"></div>
+
+  <div class="finalizado" id="finalizado" hidden>
+    <div>
+      <h2>Aplicação finalizada</h2>
+      <p>O servidor foi encerrado. Pode fechar esta aba.</p>
+    </div>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+  <script type="module" src="{{ url_for('static', filename='js/mapa.js') }}"></script>
+</body>
+</html>

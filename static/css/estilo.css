@@ -286,6 +286,7 @@ h2 { font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacin
   border: 1.5px solid var(--preto); border-radius: 6px; background: var(--preto); color: var(--branco);
 }
 .seta { color: var(--cinza); padding: 0 6px; }
+.linha-lista > * { flex: none; }
 .no {
   display: inline-flex; border: 1.5px solid var(--preto); border-radius: 6px; overflow: hidden;
   transition: transform .2s, box-shadow .2s;
@@ -415,4 +416,16 @@ label.botao { display: inline-block; }
   .topo p { display: none; }
   .barra .ferramenta span { display: none; }
   .campos, .botoes-algoritmo { grid-template-columns: 1fr; }
+}
+
+/* ---------- Troca de modo (quadro / mapa) ---------- */
+
+.modos { display: flex; gap: 2px; padding: 3px; background: var(--fundo); border-radius: 9px; margin-left: auto; }
+.modos a { color: var(--preto); text-decoration: none; padding: 6px 12px; border-radius: 7px; font-weight: 600; font-size: 13px; white-space: nowrap; }
+.modos a:hover { background: var(--branco); }
+.modos a.ativo { background: var(--preto); color: var(--branco); }
+@media (max-width: 600px) {
+  .topo { flex-wrap: wrap; }
+  .modos { order: 3; width: 100%; margin-left: 0; }
+  .modos a { flex: 1; text-align: center; }
 }

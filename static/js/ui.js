@@ -38,3 +38,12 @@ export function confirmarComSegundoClique(botao, textoConfirmar, acao) {
     }, 3000);
   });
 }
+
+// Mesma regra do back-end: números em ordem numérica, depois letras em ordem alfabética
+export function ordenarNomes(nomes) {
+  const chave = (n) => (/^\d+$/.test(n) ? [0, Number(n), ""] : [1, 0, n.toUpperCase()]);
+  return [...nomes].sort((a, b) => {
+    const [x, y] = [chave(a), chave(b)];
+    return x[0] - y[0] || x[1] - y[1] || (x[2] < y[2] ? -1 : x[2] > y[2] ? 1 : 0);
+  });
+}

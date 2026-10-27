@@ -30,5 +30,7 @@ export const api = {
   estrutura: (grafo) => enviar("/api/estrutura", paraBackend(grafo)),
   executar: (grafo, algoritmo, origem, destino) =>
     enviar("/api/executar", { grafo: paraBackend(grafo), algoritmo, origem, destino }),
+  via: (de, para) => enviar("/api/via", { de, para }),
+  local: (lat, lng) => enviar("/api/local", { lat, lng }),
   finalizar: () => enviar("/api/finalizar", {}),
 };

@@ -9,7 +9,7 @@ import { EXEMPLOS } from "./exemplos.js";
 import { grafoParaTexto, textoParaGrafo } from "./formato-texto.js";
 import { PainelEstrutura } from "./painel-estrutura.js";
 import { PainelResultado } from "./painel-resultado.js";
-import { avisar, confirmarComSegundoClique } from "./ui.js";
+import { avisar, confirmarComSegundoClique, ordenarNomes } from "./ui.js";
 
 const $ = (seletor) => document.querySelector(seletor);
 
@@ -81,15 +81,6 @@ function trocarGrafo(novo) {
   $("#chk-direcionado").checked = grafo.direcionado;
   $("#chk-ponderado").checked = grafo.ponderado;
   aoAlterarGrafo("estrutura");
-}
-
-// Mesma regra do back-end: números em ordem numérica, depois letras em ordem alfabética
-function ordenarNomes(nomes) {
-  const chave = (n) => (/^\d+$/.test(n) ? [0, Number(n), ""] : [1, 0, n.toUpperCase()]);
-  return [...nomes].sort((a, b) => {
-    const [x, y] = [chave(a), chave(b)];
-    return x[0] - y[0] || x[1] - y[1] || (x[2] < y[2] ? -1 : x[2] > y[2] ? 1 : 0);
-  });
 }
 
 function atualizarSeletores() {
