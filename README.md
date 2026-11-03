@@ -18,9 +18,10 @@ Tem dois modos, que usam o mesmo back-end e os mesmos algoritmos:
 
 | Nome | Matrícula |
 |---|---|
-| _preencher_ | _preencher_ |
-| _preencher_ | _preencher_ |
-| _preencher_ | _preencher_ |
+| Arthur Schiller | 202402851756 |
+| Bernardo Lobo Marques | 202401709433 |
+| Bernardo Moreira Gonçalves | 202401500283 |
+| Michel de Melo | 202401569852 |
 
 ---
 
