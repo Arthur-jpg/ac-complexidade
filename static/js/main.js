@@ -6,7 +6,7 @@
 import { api } from "./api.js";
 import { Editor, RAIO } from "./editor.js";
 import { EXEMPLOS } from "./exemplos.js";
-import { grafoParaTexto, textoParaGrafo } from "./formato-texto.js";
+import { grafoParaMatriz, grafoParaTexto, matrizParaGrafo, textoParaGrafo } from "./formato-texto.js";
 import { PainelEstrutura } from "./painel-estrutura.js";
 import { PainelResultado } from "./painel-resultado.js";
 import { avisar, confirmarComSegundoClique, ordenarNomes } from "./ui.js";
@@ -193,8 +193,42 @@ confirmarComSegundoClique($("#btn-limpar"), "Confirmar?", () => {
 
 const dlgImportar = $("#dlg-importar");
 
+const FORMATOS_IMPORTAR = {
+  lista: {
+    ler: textoParaGrafo,
+    escrever: grafoParaTexto,
+    exemplo: "direcionado: nao\nponderado: sim\n\nA B 4\nA C 2\nB C 1\nC D 7\nE",
+  },
+  matriz: {
+    ler: matrizParaGrafo,
+    escrever: grafoParaMatriz,
+    exemplo: "direcionado: nao\nponderado: sim\n\n  A B C D\nA 0 4 2 0\nB 4 0 1 0\nC 2 1 0 7\nD 0 0 7 0",
+  },
+};
+
+const formatoImportar = () => document.querySelector('input[name="formato-importar"]:checked').value;
+
+let formatoAnterior = formatoImportar();
+for (const radio of document.querySelectorAll('input[name="formato-importar"]')) {
+  radio.addEventListener("change", () => {
+    const anterior = formatoAnterior;
+    const novo = formatoImportar();
+    const txt = $("#txt-importar");
+    // se o texto ainda é o grafo atual pré-preenchido (ou vazio), converte para o novo formato
+    const atual = grafo.vertices.length ? FORMATOS_IMPORTAR[anterior].escrever(grafo) : "";
+    if (!txt.value.trim() || txt.value === atual) {
+      txt.value = grafo.vertices.length ? FORMATOS_IMPORTAR[novo].escrever(grafo) : "";
+    }
+    txt.placeholder = FORMATOS_IMPORTAR[novo].exemplo;
+    for (const p of document.querySelectorAll("#dlg-importar [data-formato]")) p.hidden = p.dataset.formato !== novo;
+    formatoAnterior = novo;
+  });
+}
+
 $("#btn-importar").addEventListener("click", () => {
-  if (grafo.vertices.length && !$("#txt-importar").value) $("#txt-importar").value = grafoParaTexto(grafo);
+  if (grafo.vertices.length && !$("#txt-importar").value) {
+    $("#txt-importar").value = FORMATOS_IMPORTAR[formatoImportar()].escrever(grafo);
+  }
   dlgImportar.showModal();
   $("#txt-importar").focus();
 });
@@ -209,7 +243,7 @@ $("#form-importar").addEventListener("submit", (e) => {
   if (e.submitter?.value !== "confirmar") return; // cancelar: só fecha
   e.preventDefault();
   try {
-    const lido = textoParaGrafo($("#txt-importar").value);
+    const lido = FORMATOS_IMPORTAR[formatoImportar()].ler($("#txt-importar").value);
     trocarGrafo({
       direcionado: lido.direcionado,
       ponderado: lido.ponderado,

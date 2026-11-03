@@ -383,6 +383,12 @@ h2 { font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacin
   border: 1px solid var(--cinza-claro); border-radius: 8px; padding: 10px; outline: none;
 }
 .janela textarea:focus { border-color: var(--preto); }
+.formato-importar { display: inline-flex; align-self: flex-start; }
+.formato-importar label { position: relative; cursor: pointer; }
+.formato-importar input { position: absolute; opacity: 0; pointer-events: none; }
+.formato-importar span { display: inline-block; padding: 6px 12px; border-radius: 7px; font-size: 13px; }
+.formato-importar input:checked + span { background: var(--preto); color: var(--branco); }
+.formato-importar input:focus-visible + span { outline: 2px solid var(--preto); outline-offset: 2px; }
 .acoes-janela { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
 .acoes-janela .espaco { flex: 1; }
 label.botao { display: inline-block; }

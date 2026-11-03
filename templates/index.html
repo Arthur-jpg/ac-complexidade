@@ -126,10 +126,15 @@
   <dialog id="dlg-importar" class="janela">
     <form method="dialog" id="form-importar">
       <h2>Importar grafo</h2>
-      <p class="ajuda">Uma aresta por linha: <code>origem destino peso</code>. Uma linha com um único nome cria um vértice isolado.</p>
+      <div class="formato-importar segmentado" role="radiogroup" aria-label="Formato">
+        <label><input type="radio" name="formato-importar" value="lista" checked><span>Lista de arestas</span></label>
+        <label><input type="radio" name="formato-importar" value="matriz"><span>Matriz de adjacência</span></label>
+      </div>
+      <p class="ajuda" data-formato="lista">Uma aresta por linha: <code>origem destino peso</code>. Uma linha com um único nome cria um vértice isolado.</p>
+      <p class="ajuda" data-formato="matriz" hidden>Uma linha por vértice, valores separados por espaço, <code>;</code> ou <code>,</code>. <code>0</code> (ou <code>-</code>, <code>∞</code>) = sem aresta; outro valor = peso. A primeira linha pode trazer os nomes dos vértices (senão: A, B, C…). Matriz assimétrica vira grafo direcionado.</p>
       <textarea id="txt-importar" spellcheck="false" rows="12" placeholder="direcionado: nao&#10;ponderado: sim&#10;&#10;A B 4&#10;A C 2&#10;B C 1&#10;C D 7&#10;E"></textarea>
       <div class="acoes-janela">
-        <label class="botao">Abrir arquivo .txt<input type="file" id="arq-importar" accept=".txt,text/plain" hidden></label>
+        <label class="botao">Abrir arquivo<input type="file" id="arq-importar" accept=".txt,.csv,text/plain,text/csv" hidden></label>
         <span class="espaco"></span>
         <button value="cancelar" class="botao">Cancelar</button>
         <button value="confirmar" class="botao botao-primario" id="btn-confirmar-importar">Importar</button>

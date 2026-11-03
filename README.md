@@ -137,7 +137,7 @@ São 30 testes. Eles incluem os exemplos clássicos do livro *Introduction to Al
 - **Duplo clique** em um bairro o renomeia.
 - Para apagar, use a ferramenta *Apagar*, ou selecione o item e aperte **Delete**.
 - As chaves **Direcionado** e **Com peso** definem o tipo do grafo.
-- **Importar** aceita colar texto ou abrir um arquivo `.txt`. **Exportar** baixa o grafo atual.
+- **Importar** aceita colar texto ou abrir um arquivo `.txt`/`.csv`, como lista de arestas ou matriz de adjacência. **Exportar** baixa o grafo atual.
 - **Exemplos** traz grafos prontos, incluindo um do livro do Cormen.
 
 Atalhos de teclado: `V` mover · `N` vértice · `A` aresta · `D` apagar · `Delete` apaga a seleção · `Esc` cancela.
@@ -156,6 +156,22 @@ E          # vértice isolado
 ```
 
 Também aceita `A -> B 4` e `A,B,4`. A pasta `exemplos/` tem um arquivo pronto para importar.
+
+### Matriz de adjacência (importar)
+
+Na janela **Importar**, escolha **Matriz de adjacência**:
+
+```
+direcionado: nao   # opcional: sem ele, matriz assimétrica vira grafo direcionado
+ponderado: sim     # opcional: sem ele, valores diferentes de 0/1 viram pesos
+  A B C D          # linha de nomes opcional (sem ela: A, B, C...)
+A 0 4 2 0
+B 4 0 1 0
+C 2 1 0 7
+D 0 0 7 0
+```
+
+`0`, `-` ou `∞` significam "sem aresta". Os valores podem ser separados por espaço, `;` ou `,`. A diagonal deve ser 0 (laços não são suportados).
 
 ### 2. Ver a estrutura em memória
 
