@@ -92,6 +92,7 @@ def kruskal(grafo):
 
     return {
         "arestas": escolhidas,
+        "ordenadas": arestas,
         "analisadas": analisadas,
         "custo_total": custo_total,
         "componentes": componentes,

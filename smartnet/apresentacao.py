@@ -9,7 +9,7 @@ Tipos de seção:
     {"tipo": "texto",     "titulo": ..., "conteudo": "texto"}
     {"tipo": "destaque",  "titulo": ..., "conteudo": "texto"}       -> número/resposta principal
 
-Além das seções, DFS, BFS e Dijkstra devolvem "prova": os mesmos resultados
+Além das seções, os algoritmos devolvem "prova": os mesmos resultados
 no formato pedido na prova, usado pela janela "Folha de prova".
 """
 
@@ -158,6 +158,21 @@ def formatar_kruskal(grafo, resultado):
         tempo="O(E log E)", memoria="O(V + E)",
         explicacao="Ordenar as arestas com merge sort domina o custo (E log E). Cada consulta "
                    "ao Union-Find custa praticamente O(1).",
+        prova={
+            "ordenadas": [[u, v, formatar_numero(peso)]
+                          for u, v, peso in resultado["ordenadas"]],
+            "iniciais": ["{%s}" % v for v in grafo.vertices()],
+            "linhas": [
+                {"aresta": "%s — %s" % (u, v), "peso": formatar_numero(peso),
+                 "aceita": aceita, "componentes": passo["estrutura"]["itens"]}
+                for (u, v, peso, aceita), passo in
+                zip(resultado["analisadas"], resultado["passos"][1:])
+            ],
+            "escolhidas": escolhidas,
+            "custo_total": formatar_numero(resultado["custo_total"]),
+            "componentes": resultado["componentes"],
+            "nao_analisadas": nao_analisadas,
+        },
     )
 
 

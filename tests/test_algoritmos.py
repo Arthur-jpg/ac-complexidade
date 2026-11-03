@@ -7,7 +7,7 @@ import json
 import os
 import unittest
 
-from smartnet import central, mapa
+from smartnet import apresentacao, central, mapa
 from smartnet.algoritmos import bfs, dfs, dijkstra, kruskal
 from smartnet.estruturas.fila import Fila
 from smartnet.estruturas.heap import HeapMinimo
@@ -177,6 +177,25 @@ class TestKruskal(unittest.TestCase):
     def test_direcionado_e_recusado(self):
         with self.assertRaises(ValueError):
             kruskal(montar([("A", "B", 1)], direcionado=True))
+
+    def test_folha_de_prova_registra_componentes_e_ciclo(self):
+        grafo = montar([("A", "B", 1), ("B", "C", 2), ("A", "C", 3),
+                        ("C", "D", 4), ("A", "D", 5)])
+        resposta = apresentacao.formatar_kruskal(grafo, kruskal(grafo))
+        prova = resposta["prova"]
+        self.assertEqual(prova["ordenadas"], [["A", "B", "1"], ["B", "C", "2"],
+                                               ["A", "C", "3"], ["C", "D", "4"], ["A", "D", "5"]])
+        self.assertEqual(prova["iniciais"], ["{A}", "{B}", "{C}", "{D}"])
+        self.assertEqual([linha["aceita"] for linha in prova["linhas"]], [True, True, False, True])
+        self.assertEqual(prova["linhas"][2]["componentes"], ["{A, B, C}", "{D}"])
+        self.assertEqual(prova["linhas"][-1]["componentes"], ["{A, B, C, D}"])
+        self.assertEqual(prova["nao_analisadas"], 1)
+
+    def test_folha_de_prova_mostra_vertice_isolado(self):
+        grafo = montar([("A", "B", 1)], vertices=["C"])
+        resposta = apresentacao.formatar_kruskal(grafo, kruskal(grafo))
+        self.assertEqual(resposta["prova"]["linhas"][-1]["componentes"], ["{A, B}", "{C}"])
+        self.assertTrue(any(s["titulo"] == "Grafo desconexo" for s in resposta["secoes"]))
 
 
 class TestCentral(unittest.TestCase):

@@ -263,10 +263,10 @@ for (const botao of botoesAlgoritmo) {
 }
 
 // ---------------------------------------------------------------------
-// Folha de prova: janela separada com DFS, BFS e Dijkstra no formato da prova
+// Folha de prova: janela separada com os algoritmos no formato da prova
 // ---------------------------------------------------------------------
 
-const ALGORITMOS_FOLHA = ["dfs", "bfs", "dijkstra"];
+const ALGORITMOS_FOLHA = ["dfs", "bfs", "dijkstra", "kruskal"];
 let janelaFolha = null;
 let pedidoFolha = 0;
 
@@ -290,7 +290,7 @@ window.addEventListener("message", (e) => {
   enviarFolha(null);
 });
 
-// Executa os três algoritmos com o grafo atual e manda para a folha.
+// Executa os algoritmos com o grafo atual e manda para a folha.
 // "destaque" é o algoritmo que acabou de ser executado (a folha chama atenção para ele).
 async function enviarFolha(destaque) {
   if (!janelaFolha || janelaFolha.closed) return;

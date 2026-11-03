@@ -1,8 +1,8 @@
 // =====================================================================
-// Janela "Folha de prova": mostra DFS, BFS e Dijkstra no formato pedido
+// Janela "Folha de prova": mostra os algoritmos no formato pedido
 // na prova, numa janela separada da tela principal.
 //
-// Quem calcula é a janela principal (main.js): ela executa os três
+// Quem calcula é a janela principal (main.js): ela executa os
 // algoritmos com o grafo atual e manda o resultado para cá por mensagem.
 //   esta janela  --{ tipo: "folha-pronta" }-->  janela principal
 //   principal    --{ tipo: "folha", dados, destaque }-->  esta janela
@@ -48,6 +48,7 @@ function mostrar(dados, destaque) {
   preencher("dfs", dados.dfs, desenharDFS);
   preencher("bfs", dados.bfs, montarBFS);
   preencher("dijkstra", dados.dijkstra, montarDijkstra);
+  preencher("kruskal", dados.kruskal, montarKruskal);
 
   for (const q of document.querySelectorAll(".questao")) q.classList.remove("destacada");
   const alvo = destaque && $(`#q-${destaque}`);
@@ -255,5 +256,32 @@ function montarDijkstra(p) {
     </p>
     <p class="linha-resumo">Ordem de escolha: ${p.linhas.map((l) => escapar(l.escolhido)).join(", ")}${
       p.inalcancaveis.length ? ` · inalcançáveis: ${p.inalcancaveis.map(escapar).join(", ")}` : ""}</p>`;
+  return bloco;
+}
+
+// 4. Kruskal: ordenação, decisões e união dos componentes.
+function montarKruskal(p) {
+  const bloco = document.createElement("div");
+  bloco.className = "bloco-kruskal";
+  const linhas = p.ordenadas.map(([u, v, peso], i) => {
+    const linha = p.linhas[i];
+    let resultado = "";
+    if (linha && linha.aceita) {
+      resultado = linha.componentes.map(escapar).join(" ");
+      if (i === p.linhas.length - 1 && p.componentes === 1) resultado += ' <span class="kruskal-nota">concluído</span>';
+    } else if (linha) {
+      resultado = '<span class="kruskal-rejeitada">rejeitada (ciclo)</span>';
+    }
+    return `<div class="kruskal-linha${linha ? "" : " nao-analisada"}">
+      <span class="kruskal-aresta">${escapar(peso)}: {${escapar(u)}, ${escapar(v)}}</span>
+      <span class="kruskal-componentes">${resultado}</span></div>`;
+  }).join("");
+  const soma = p.escolhidas.map(([, peso]) => escapar(peso)).join(" + ");
+  bloco.innerHTML = `
+    <p class="kruskal-inicial">Inicial: ${p.iniciais.map(escapar).join(" ") || "∅"}</p>
+    <div class="kruskal-rastro">${linhas || "Nenhuma aresta."}</div>
+    <p class="kruskal-custo">Custo: ${soma ? `${soma} = ` : ""}${escapar(p.custo_total)}</p>
+    ${p.componentes > 1 ? `<p class="linha-resumo">Grafo desconexo: floresta geradora mínima com ${p.componentes} componentes.</p>` : ""}
+    ${p.nao_analisadas ? '<p class="legenda-prova">Arestas após a conclusão não são analisadas.</p>' : ""}`;
   return bloco;
 }

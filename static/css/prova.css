@@ -83,6 +83,16 @@ body.pagina-prova { height: auto; min-height: 100%; }
 
 /* ---------- Telas estreitas e impressão ---------- */
 
+.bloco-kruskal { font-family: var(--fonte-mono); font-size: 14px; line-height: 1.9; }
+.kruskal-inicial { margin-bottom: 10px; }
+.kruskal-linha { display: flex; gap: 24px; align-items: baseline; }
+.kruskal-aresta { min-width: 120px; white-space: nowrap; }
+.kruskal-componentes { white-space: normal; }
+.kruskal-rejeitada { color: var(--cinza-escuro); font-style: italic; }
+.kruskal-nota { font-weight: 700; margin-left: 10px; }
+.kruskal-linha.nao-analisada { color: var(--cinza); }
+.kruskal-custo { margin-top: 12px; font-weight: 700; }
+
 @media (max-width: 760px) {
   .folha { grid-template-columns: minmax(0, 1fr); padding: 20px 16px; width: calc(100% - 24px); }
   .pagina-prova .topo { flex-wrap: wrap; }
