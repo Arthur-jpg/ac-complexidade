@@ -7,6 +7,7 @@ Depois abrir http://localhost:5000 (o navegador abre sozinho).
 Rotas:
     GET  /               -> a interface (quadro branco)
     GET  /mapa           -> a interface no mapa real da cidade
+    GET  /prova          -> janela "Folha de prova" (DFS, BFS e Dijkstra no formato da prova)
     POST /api/estrutura  -> devolve como o grafo fica na lista de adjacência
     POST /api/executar   -> executa um algoritmo e devolve resultados + passos
     POST /api/via        -> mede uma via no mapa (distância pelas ruas, tempo, desenho)
@@ -36,6 +37,11 @@ def pagina_inicial():
 @app.get("/mapa")
 def pagina_mapa():
     return render_template("mapa.html")
+
+
+@app.get("/prova")
+def pagina_prova():
+    return render_template("prova.html")
 
 
 @app.post("/api/estrutura")

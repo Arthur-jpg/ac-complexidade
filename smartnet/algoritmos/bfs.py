@@ -28,6 +28,7 @@ def bfs(grafo, origem):
     fila = Fila()
 
     fila.enfileirar(origem)
+    rodadas = [(None, fila.conteudo())]  # (quem saiu da fila, como a fila ficou) — formato da prova
     registro.anotar(
         "Coloca a origem %s na fila (nível 0)." % origem,
         vertices={origem: "fronteira"},
@@ -66,6 +67,7 @@ def bfs(grafo, origem):
                     estrutura=_mostrar_fila(fila),
                 )
 
+        rodadas.append((vertice, fila.conteudo()))
         registro.anotar(
             "%s concluído." % vertice,
             vertices={vertice: "visitado"},
@@ -82,6 +84,7 @@ def bfs(grafo, origem):
         "ordem": ordem_visita,
         "nivel": nivel,
         "pai": pai,
+        "rodadas": rodadas,
         "nao_alcancados": nao_alcancados,
         "passos": registro.passos,
     }

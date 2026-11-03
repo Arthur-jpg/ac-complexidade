@@ -255,10 +255,59 @@ async function executar(algoritmo) {
   } finally {
     for (const b of botoesAlgoritmo) b.disabled = false;
   }
+  enviarFolha(algoritmo); // se a folha de prova estiver aberta, ela acompanha
 }
 
 for (const botao of botoesAlgoritmo) {
   botao.addEventListener("click", () => executar(botao.dataset.algoritmo));
+}
+
+// ---------------------------------------------------------------------
+// Folha de prova: janela separada com DFS, BFS e Dijkstra no formato da prova
+// ---------------------------------------------------------------------
+
+const ALGORITMOS_FOLHA = ["dfs", "bfs", "dijkstra"];
+let janelaFolha = null;
+let pedidoFolha = 0;
+
+$("#btn-folha").addEventListener("click", () => {
+  if (janelaFolha && !janelaFolha.closed) {
+    janelaFolha.focus();
+    enviarFolha(null);
+    return;
+  }
+  // abre encostada no lado direito da tela, para ficar ao lado desta janela
+  const largura = Math.round(Math.min(1000, screen.availWidth / 2));
+  janelaFolha = window.open("/prova", "folha-prova",
+    `popup,width=${largura},height=${screen.availHeight - 60},left=${screen.availWidth - largura},top=0`);
+  if (!janelaFolha) avisar("O navegador bloqueou a janela. Permita pop-ups para este endereço.", true);
+});
+
+// a folha avisa quando carregou (ou quando clicam em "Atualizar" nela)
+window.addEventListener("message", (e) => {
+  if (e.origin !== location.origin || e.data?.tipo !== "folha-pronta") return;
+  janelaFolha = e.source;
+  enviarFolha(null);
+});
+
+// Executa os três algoritmos com o grafo atual e manda para a folha.
+// "destaque" é o algoritmo que acabou de ser executado (a folha chama atenção para ele).
+async function enviarFolha(destaque) {
+  if (!janelaFolha || janelaFolha.closed) return;
+  const pedido = ++pedidoFolha;
+  const origem = $("#sel-origem").value;
+  const respostas = await Promise.all(ALGORITMOS_FOLHA.map((algoritmo) =>
+    api.executar(grafo, algoritmo, origem, null)
+      .then((r) => ({ prova: r.prova }))
+      .catch((erro) => ({ erro: erro.message }))));
+  if (pedido !== pedidoFolha || janelaFolha.closed) return; // chegou um pedido mais novo
+
+  const dados = {
+    info: { vertices: grafo.vertices.length, arestas: grafo.arestas.length,
+            direcionado: grafo.direcionado, origem: origem || "—" },
+  };
+  ALGORITMOS_FOLHA.forEach((algoritmo, i) => { dados[algoritmo] = respostas[i]; });
+  janelaFolha.postMessage({ tipo: "folha", dados, destaque }, location.origin);
 }
 
 // ---------------------------------------------------------------------

@@ -1,0 +1,96 @@
+/* =====================================================================
+   Janela "Folha de prova" — cara de folha de papel, preto e branco
+   ===================================================================== */
+
+body.pagina-prova { height: auto; min-height: 100%; }
+
+.acoes-prova { display: flex; gap: 8px; flex: none; }
+.pagina-prova .topo p { margin-top: 2px; }
+
+.folha {
+  width: min(1100px, calc(100% - 32px));
+  margin: 20px auto 40px;
+  padding: 28px 32px;
+  background: var(--branco);
+  border: 1px solid var(--linha);
+  border-radius: var(--raio);
+  box-shadow: var(--sombra);
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 28px 40px;
+}
+
+.questao { min-width: 0; border-radius: 8px; padding: 6px; margin: -6px; }
+.questao.larga { grid-column: 1 / -1; }
+.questao h2 { font-size: 16px; font-weight: 700; margin-bottom: 14px; }
+.questao h2 .numero { font-family: var(--fonte-mono); margin-right: 4px; }
+.questao .conteudo { overflow-x: auto; }
+.questao.destacada { animation: destaque-questao 2.2s ease-out; }
+@keyframes destaque-questao {
+  0%, 35% { box-shadow: 0 0 0 2px var(--preto); }
+  100% { box-shadow: 0 0 0 2px transparent; }
+}
+
+.erro-prova { color: var(--cinza-escuro); font-style: italic; }
+.linha-resumo { margin-top: 10px; font-size: 13px; color: var(--grafite); }
+.legenda-prova { display: flex; flex-wrap: wrap; gap: 6px 16px; margin-top: 8px; font-size: 12px; color: var(--cinza-escuro); }
+.legenda-prova span { display: inline-flex; align-items: center; gap: 6px; }
+.legenda-prova .traco { display: inline-block; width: 22px; border-top: 2px solid var(--preto); }
+.legenda-prova .traco.tracejado { border-top: 1.5px dashed var(--cinza-escuro); }
+.legenda-prova .circulo { display: inline-block; width: 14px; height: 14px; border: 1.5px solid var(--preto); border-radius: 50%; }
+
+/* ---------- 1. DFS ---------- */
+
+.desenho-dfs { display: block; max-width: none; }
+.desenho-dfs line.arvore { stroke: var(--preto); stroke-width: 2; }
+.desenho-dfs path.outra { fill: none; stroke: var(--cinza-escuro); stroke-width: 1.4; stroke-dasharray: 5 4; }
+.desenho-dfs marker path { fill: var(--grafite); }
+.vertice-prova circle { fill: var(--branco); stroke: var(--preto); stroke-width: 1.8; }
+.vertice-prova.raiz circle { stroke-width: 3; }
+.vertice-prova .nome { font: 700 13px var(--fonte); text-anchor: middle; dominant-baseline: central; }
+.vertice-prova .tempos { font: 600 11px var(--fonte-mono); fill: var(--grafite); dominant-baseline: auto; }
+
+/* ---------- 2. BFS ---------- */
+
+.bloco-bfs { display: flex; flex-wrap: wrap; align-items: flex-start; gap: 20px 32px; }
+.rastro { border-collapse: collapse; font-family: var(--fonte-mono); font-size: 14px; }
+.rastro th { padding: 4px 18px 4px 0; text-align: left; font-weight: 700; vertical-align: bottom; }
+.rastro td { padding: 2px 0; }
+
+.vetor { display: inline-flex; align-items: flex-end; font-family: var(--fonte-mono); }
+.vetor .colchete { font-size: 17px; line-height: 1.25; }
+.vetor .virgula { line-height: 1.6; margin-right: 4px; }
+.vetor .item { display: inline-flex; flex-direction: column; align-items: center; min-width: 12px; line-height: 1.2; }
+.vetor .item small { font-size: 10px; color: var(--cinza-escuro); }
+
+.vetor-final { display: flex; flex-direction: column; align-items: flex-start; gap: 4px; }
+.vetor-final .rotulo { font-size: 12px; color: var(--cinza-escuro); }
+.vetor-final .vetor { font-size: 16px; }
+.vetor-final .vetor .item small { font-size: 11px; }
+
+/* ---------- 3. Dijkstra ---------- */
+
+.matriz { border-collapse: collapse; font-family: var(--fonte-mono); font-size: 14px; }
+.matriz th, .matriz td { min-width: 52px; height: 38px; padding: 0 8px; text-align: center; border-bottom: 1px solid var(--linha); }
+.matriz th + th, .matriz td, .matriz th + td { border-left: 1px solid var(--cinza-claro); }
+.matriz thead th { font-family: var(--fonte); font-weight: 700; border-bottom: 1.5px solid var(--preto); }
+.matriz .iteracao { min-width: 34px; color: var(--cinza); font-weight: 400; font-size: 11px; border-left: 0; }
+.matriz td span { display: inline-flex; align-items: center; justify-content: center; min-width: 28px; height: 28px; padding: 0 4px; }
+.matriz td.escolhido span { border: 1.8px solid var(--preto); border-radius: 999px; font-weight: 700; }
+.matriz td.mudou span { font-weight: 700; }
+.matriz tfoot tr:first-child > * { border-top: 1.5px solid var(--preto); }
+.matriz tfoot td { color: var(--grafite); font-size: 13px; }
+
+/* ---------- Telas estreitas e impressão ---------- */
+
+@media (max-width: 760px) {
+  .folha { grid-template-columns: minmax(0, 1fr); padding: 20px 16px; width: calc(100% - 24px); }
+  .pagina-prova .topo { flex-wrap: wrap; }
+}
+
+@media print {
+  body.pagina-prova { background: var(--branco); }
+  .pagina-prova .topo { display: none; }
+  .folha { box-shadow: none; border: 0; margin: 0; width: 100%; padding: 0; }
+  .questao.destacada { animation: none; }
+}

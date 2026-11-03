@@ -50,6 +50,7 @@ def dijkstra(grafo, origem):
     anterior = {v: None for v in grafo.vertices()}
     finalizados = set()
     ordem_finalizacao = []
+    tabela = []  # uma linha por vértice finalizado: distâncias naquele momento (matriz da prova)
     heap = HeapMinimo()
 
     distancia[origem] = 0
@@ -72,6 +73,10 @@ def dijkstra(grafo, origem):
             )
             continue
 
+        tabela.append({
+            "escolhido": vertice,
+            "distancias": {v: distancia[v] for v in grafo.vertices() if v not in finalizados},
+        })
         finalizados.add(vertice)
         ordem_finalizacao.append(vertice)
         registro.anotar(
@@ -121,6 +126,7 @@ def dijkstra(grafo, origem):
         "distancia": distancia,
         "anterior": anterior,
         "ordem": ordem_finalizacao,
+        "tabela": tabela,
         "passos": registro.passos,
     }
 

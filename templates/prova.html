@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Folha de prova · SmartNet Analyzer</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23111'/%3E%3Cpath d='M9 22 16 10 23 20' stroke='%23fff' stroke-width='2' fill='none'/%3E%3Ccircle cx='9' cy='22' r='3.2' fill='%23fff'/%3E%3Ccircle cx='16' cy='10' r='3.2' fill='%23fff'/%3E%3Ccircle cx='23' cy='20' r='3.2' fill='%23fff'/%3E%3C/svg%3E">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/estilo.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/prova.css') }}">
+</head>
+<body class="pagina-prova">
+  <header class="topo">
+    <div>
+      <h1>Folha de <span>prova</span></h1>
+      <p id="info">Aguardando o grafo da janela principal…</p>
+    </div>
+    <div class="acoes-prova">
+      <button id="btn-atualizar" class="botao" title="Recalcular com o grafo atual da janela principal">Atualizar</button>
+      <button id="btn-imprimir" class="botao botao-contorno" title="Imprimir ou salvar em PDF">Imprimir</button>
+    </div>
+  </header>
+
+  <main class="folha" id="folha">
+    <section class="questao" id="q-dfs">
+      <h2><span class="numero">1.</span> DFS</h2>
+      <div class="conteudo"></div>
+    </section>
+
+    <section class="questao" id="q-bfs">
+      <h2><span class="numero">2.</span> BFS</h2>
+      <div class="conteudo"></div>
+    </section>
+
+    <section class="questao larga" id="q-dijkstra">
+      <h2><span class="numero">3.</span> Dijkstra</h2>
+      <div class="conteudo"></div>
+    </section>
+  </main>
+
+  <script type="module" src="{{ url_for('static', filename='js/prova.js') }}"></script>
+</body>
+</html>

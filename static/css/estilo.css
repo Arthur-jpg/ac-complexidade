@@ -329,6 +329,7 @@ h2 { font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacin
 .botoes-algoritmo button:hover, .botoes-algoritmo button.ativo { background: var(--preto); color: var(--branco); }
 .botoes-algoritmo button:hover span, .botoes-algoritmo button.ativo span { color: var(--cinza-claro); }
 .botoes-algoritmo button:disabled { opacity: .5; cursor: wait; }
+.botao-folha { width: 100%; margin-top: 8px; font-weight: 600; }
 
 .resultado { flex: 1; }
 .resultado-vazio { display: flex; flex-direction: column; align-items: center; gap: 12px; text-align: center; color: var(--cinza-escuro); padding: 28px 8px; }

@@ -8,6 +8,9 @@ Tipos de seção:
     {"tipo": "tabela",    "titulo": ..., "colunas": [...], "linhas": [[...]]}
     {"tipo": "texto",     "titulo": ..., "conteudo": "texto"}
     {"tipo": "destaque",  "titulo": ..., "conteudo": "texto"}       -> número/resposta principal
+
+Além das seções, DFS, BFS e Dijkstra devolvem "prova": os mesmos resultados
+no formato pedido na prova, usado pela janela "Folha de prova".
 """
 
 from .passos import formatar_numero
@@ -43,6 +46,16 @@ def formatar_dfs(grafo, resultado, origem):
         tempo="O(V + E)", memoria="O(V)",
         explicacao="Cada vértice é visitado uma vez (V) e cada lista de vizinhos é lida "
                    "uma vez (E). Com matriz de adjacência seria O(V²).",
+        prova={
+            "origem": origem,
+            "direcionado": grafo.direcionado,
+            "ordem": resultado["ordem"],
+            "raizes": raizes,
+            "pai": resultado["pai"],
+            "descoberta": resultado["descoberta"],
+            "finalizacao": resultado["finalizacao"],
+            "arestas": [[u, v] for u, v, _ in grafo.arestas()],
+        },
     )
 
 
@@ -52,6 +65,7 @@ def formatar_bfs(grafo, resultado, origem):
         caminho = reconstruir_caminho(resultado["pai"], v)
         linhas.append([v, resultado["nivel"][v], resultado["pai"][v] or "—", " → ".join(caminho)])
 
+    nivel = resultado["nivel"]
     secoes = [
         {"tipo": "sequencia", "titulo": "Fila de execução (ordem de saída da fila)", "itens": resultado["ordem"]},
         {"tipo": "arvore", "titulo": "Árvore da BFS",
@@ -66,6 +80,14 @@ def formatar_bfs(grafo, resultado, origem):
         tempo="O(V + E)", memoria="O(V)",
         explicacao="Cada vértice entra e sai da fila uma vez (V) e cada lista de vizinhos "
                    "é lida uma vez (E). Com matriz de adjacência seria O(V²).",
+        prova={
+            "origem": origem,
+            # cada linha: quem saiu da fila (None na primeira) e a fila depois, com a distância de cada um
+            "linhas": [{"vertice": v, "fila": [[x, nivel[x]] for x in fila]}
+                       for v, fila in resultado["rodadas"]],
+            "ordem": [[v, nivel[v]] for v in resultado["ordem"]],
+            "nao_alcancados": resultado["nao_alcancados"],
+        },
     )
 
 
@@ -103,6 +125,7 @@ def formatar_dijkstra(grafo, resultado, origem, destino):
         tempo="O((V + E) log V)", memoria="O(V + E)",
         explicacao="Cada aresta pode gerar uma inserção no heap, e cada operação do heap custa "
                    "O(log V). Com matriz de adjacência a versão natural seria O(V²).",
+        prova=_prova_dijkstra(grafo, resultado, origem),
     )
 
 
@@ -211,11 +234,39 @@ def _passo_caminho(caminho, custo):
     }
 
 
-def _resposta(algoritmo, titulo, secoes, passos, tempo, memoria, explicacao):
+def _prova_dijkstra(grafo, resultado, origem):
+    """
+    Matriz da prova: uma coluna por vértice e uma linha por vértice finalizado.
+    Cada linha mostra as distâncias no momento da escolha; a coluna de quem já
+    foi finalizado fica vazia dali para baixo.
+    """
+    linhas = []
+    anterior = {}
+    for linha in resultado["tabela"]:
+        valores = {v: formatar_numero(d) for v, d in linha["distancias"].items()}
+        linhas.append({
+            "escolhido": linha["escolhido"],
+            "valores": valores,
+            "mudou": [v for v, d in valores.items() if v in anterior and anterior[v] != d],
+        })
+        anterior = valores
+    finalizados = set(resultado["ordem"])
+    return {
+        "origem": origem,
+        "colunas": grafo.vertices(),
+        "linhas": linhas,
+        "inalcancaveis": [v for v in grafo.vertices() if v not in finalizados],
+        "resultado": [[v, formatar_numero(resultado["distancia"][v]), resultado["anterior"][v]]
+                      for v in grafo.vertices()],
+    }
+
+
+def _resposta(algoritmo, titulo, secoes, passos, tempo, memoria, explicacao, prova=None):
     return {
         "algoritmo": algoritmo,
         "titulo": titulo,
         "complexidade": {"tempo": tempo, "memoria": memoria, "explicacao": explicacao},
         "secoes": secoes,
         "passos": passos,
+        "prova": prova,
     }
