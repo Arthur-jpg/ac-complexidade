@@ -268,6 +268,7 @@ export class Editor {
     if (alvo.tipo === "vertice") {
       if (this.ferramenta === "aresta" || e.shiftKey) {
         if (this.pendente && this.pendente !== alvo.nome) {
+          e.preventDefault(); // senão o mousedown que vem depois tira o foco da caixa de peso
           this._criarAresta(this.pendente, alvo.nome);
           this.pendente = null;
           this.desenhar();
@@ -285,7 +286,10 @@ export class Editor {
 
     if (alvo.tipo === "aresta" || alvo.tipo === "peso") {
       this._selecionar({ tipo: "aresta", indice: alvo.indice });
-      if (alvo.tipo === "peso") this._editarPeso(alvo.indice);
+      if (alvo.tipo === "peso") {
+        e.preventDefault(); // senão o mousedown que vem depois tira o foco da caixa e ela fecha na hora
+        this._editarPeso(alvo.indice);
+      }
       return;
     }
 
@@ -349,7 +353,7 @@ export class Editor {
       this._criarVertice(p.x, p.y);
     } else if (alvo.tipo === "vertice") {
       this._renomear(alvo.nome);
-    } else if (alvo.tipo === "aresta") {
+    } else if (alvo.tipo === "aresta" || alvo.tipo === "peso") {
       this._editarPeso(alvo.indice);
     }
   }
